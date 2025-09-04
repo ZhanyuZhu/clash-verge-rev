@@ -30,8 +30,6 @@ import { initGlobalLogService } from "@/services/global-log-service";
 import { invoke } from "@tauri-apps/api/core";
 import { showNotice } from "@/services/noticeService";
 import { NoticeManager } from "@/components/base/NoticeManager";
-import { useLocalStorage } from "foxact/use-local-storage";
-import { LogLevel } from "@/hooks/use-log-data";
 
 const appWindow = getCurrentWebviewWindow();
 export let portableFlag = false;
@@ -156,7 +154,6 @@ const Layout = () => {
   const { verge } = useVerge();
   const { clashInfo } = useClashInfo();
   const [enableLog] = useEnableLog();
-  const [logLevel] = useLocalStorage<LogLevel>("log:log-level", "info");
   const { language, start_page } = verge ?? {};
   const navigate = useNavigate();
   const location = useLocation();
@@ -186,9 +183,10 @@ const Layout = () => {
   // 初始化全局日志服务
   useEffect(() => {
     if (clashInfo) {
-      initGlobalLogService(enableLog, logLevel);
+      const { server = "", secret = "" } = clashInfo;
+      initGlobalLogService(enableLog, "info");
     }
-  }, [clashInfo, enableLog, logLevel]);
+  }, [clashInfo, enableLog]);
 
   // 设置监听器
   useEffect(() => {
@@ -296,7 +294,7 @@ const Layout = () => {
         setTimeout(() => {
           try {
             initialOverlay.remove();
-          } catch {
+          } catch (e) {
             console.log("[Layout] 加载指示器已被移除");
           }
         }, 300);
@@ -402,7 +400,7 @@ const Layout = () => {
           hasEventTriggered = true;
           performInitialization();
         }
-      } catch {
+      } catch (err) {
         console.log("[Layout] 后端尚未就绪，等待启动完成事件");
       }
     };
@@ -543,54 +541,59 @@ const Layout = () => {
               : {},
           ]}
         >
-          <div className="layout__left">
-            <div className="the-logo" data-tauri-drag-region="true">
-              <div
-                data-tauri-drag-region="true"
-                style={{
-                  height: "27px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <SvgIcon
-                  component={isDark ? iconDark : iconLight}
+          <div className="titlebar">
+              <div className="the-logo" data-tauri-drag-region="true">
+                <div
+                  data-tauri-drag-region="true"
                   style={{
-                    height: "36px",
-                    width: "36px",
-                    marginTop: "-3px",
-                    marginRight: "5px",
-                    marginLeft: "-3px",
+                    border: "1px solid",
+                    height: "27px",
+                    width: "200px",
+                    display: "flex",
+                    justifyContent: "space-between",
                   }}
-                  inheritViewBox
-                />
-                <LogoSvg fill={isDark ? "white" : "black"} />
-              </div>
-              <UpdateButton className="the-newbtn" />
-            </div>
-
-            <List className="the-menu">
-              {routers.map((router) => (
-                <LayoutItem
-                  key={router.label}
-                  to={router.path}
-                  icon={router.icon}
                 >
-                  {t(router.label)}
-                </LayoutItem>
-              ))}
-            </List>
-
-            <div className="the-traffic">
-              <LayoutTraffic />
-            </div>
+                  <SvgIcon
+                    component={isDark ? iconDark : iconLight}
+                    style={{
+                      height: "36px",
+                      width: "36px",
+                      marginTop: "-3px",
+                      marginRight: "5px",
+                      marginLeft: "-3px",
+                    }}
+                    inheritViewBox
+                  />
+                  <LogoSvg fill={isDark ? "white" : "black"} />
+                  <UpdateButton className="the-newbtn" />
+                </div>
+              </div>
           </div>
+          <div className="main-content">
+            <div className="layout__left">
 
-          <div className="layout__right">
-            <div className="the-bar"></div>
+              <List className="the-menu">
+                {routers.map((router) => (
+                  <LayoutItem
+                    key={router.label}
+                    to={router.path}
+                    icon={router.icon}
+                  >
+                    {t(router.label)}
+                  </LayoutItem>
+                ))}
+              </List>
 
-            <div className="the-content">
-              {React.cloneElement(routersEles, { key: location.pathname })}
+              <div className="the-traffic">
+                <LayoutTraffic />
+              </div>
+            </div>
+            <div className="layout__right">
+              <div className="the-bar"></div>
+
+              <div className="the-content">
+                {React.cloneElement(routersEles, { key: location.pathname })}
+              </div>
             </div>
           </div>
         </Paper>

@@ -542,36 +542,35 @@ const Layout = () => {
           ]}
         >
           <div className="titlebar">
-              <div className="the-logo" data-tauri-drag-region="true">
-                <div
-                  data-tauri-drag-region="true"
+            <div className="the-logo" data-tauri-drag-region="true">
+              <div
+                data-tauri-drag-region="true"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <SvgIcon
+                  component={isDark ? iconDark : iconLight}
                   style={{
-                    border: "1px solid",
-                    height: "27px",
-                    width: "200px",
-                    display: "flex",
-                    justifyContent: "space-between",
+                    height: "36px",
+                    width: "36px",
+                    marginTop: "-3px",
+                    marginRight: "5px",
+                    marginLeft: "-3px",
                   }}
-                >
-                  <SvgIcon
-                    component={isDark ? iconDark : iconLight}
-                    style={{
-                      height: "36px",
-                      width: "36px",
-                      marginTop: "-3px",
-                      marginRight: "5px",
-                      marginLeft: "-3px",
-                    }}
-                    inheritViewBox
-                  />
-                  <LogoSvg fill={isDark ? "white" : "black"} />
-                  <UpdateButton className="the-newbtn" />
-                </div>
+                  inheritViewBox
+                />
+                <LogoSvg
+                  fill={isDark ? "white" : "black"}
+                  style={{ height: "27px" }}
+                />
+                <UpdateButton className="the-newbtn" />
               </div>
+            </div>
           </div>
           <div className="main-content">
             <div className="layout__left">
-
               <List className="the-menu">
                 {routers.map((router) => (
                   <LayoutItem
